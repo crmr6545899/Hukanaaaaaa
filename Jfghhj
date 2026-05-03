@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Timer</title>
+    <style>
+        :root {
+            --primary-color: #e74c3c;
+            --bg-color: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 350px;
+        }
+
+        h1 { color: #333; margin-bottom: 1rem; }
+
+        .timer-display {
+            font-size: 5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 1.5rem 0;
+        }
+
+        .controls button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin: 0 5px;
+        }
+
+        .controls button:hover {
+            opacity: 0.8;
+        }
+
+        .controls .reset-btn {
+            background: #95a5a6;
+        }
+
+        .modes {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .mode-btn {
+            background: #eee;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .mode-btn.active {
+            background: #333;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Focus Time</h1>
+    
+    <div class="modes">
+        <button class="mode-btn active" onclick="setTimer(25)">Focus</button>
+        <button class="mode-btn" onclick="setTimer(5)">Break</button>
+    </div>
+
+    <div class="timer-display" id="timer">25:00</div>
+
+    <div class="controls">
+        <button id="startBtn">Start</button>
+        <button class="reset-btn" id="resetBtn">Reset</button>
+    </div>
+</div>
+
+<script>
+    let timeLeft = 25 * 60;
+    let timerId = null;
+    const timerDisplay = document.getElementById('timer');
+    const startBtn = document.getElementById('startBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    function updateDisplay() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        document.title = `${timerDisplay.textContent} - Pomodoro`;
+    }
+
+    function setTimer(mins) {
+        clearInterval(timerId);
+        timerId = null;
+        timeLeft = mins * 60;
+        startBtn.textContent = 'Start';
+        updateDisplay();
+        
+        // Update UI buttons
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.textContent.includes(mins == 25 ? 'Focus' : 'Break'));
+        });
+    }
+
+    startBtn.addEventListener('click', () => {
+        if (timerId === null) {
+            startBtn.textContent = 'Pause';
+            timerId = setInterval(() => {
+                timeLeft--;
+                updateDisplay();
+                if (timeLeft === 0) {
+                    clearInterval(timerId);
+                    alert('หมดเวลาแล้ว! พักสักหน่อยครับ');
+                }
+            }, 1000);
+        } else {
+            clearInterval(timerId);
+            timerId = null;
+            startBtn.textContent = 'Resume';
+        }
+    });
+
+    resetBtn.addEventListener('click', () => {
+        setTimer(25);
+    });
+
+    updateDisplay();
+</script>
+
+</body>
+</html>
